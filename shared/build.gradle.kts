@@ -47,6 +47,8 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
+
+            implementation(libs.ktor.client.okhttp)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -57,6 +59,11 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(compose.materialIconsExtended)
+
+            // Agrega estas dos líneas justo aquí abajo:
+            implementation(libs.ktor.client.core)
+            implementation(libs.settings.no.arg)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

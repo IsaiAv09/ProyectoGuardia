@@ -24,4 +24,3 @@ fun AppAndroidPreview() {
     App()
 }
 
-Cambio 1
