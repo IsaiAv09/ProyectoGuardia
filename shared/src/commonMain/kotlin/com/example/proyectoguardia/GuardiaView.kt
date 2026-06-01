@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 
+/// Vista realizada por Main
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GuardiaView() {

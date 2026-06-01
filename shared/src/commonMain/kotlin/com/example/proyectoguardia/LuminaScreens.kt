@@ -17,6 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+/// Vista realizada por Rama 1
+
 @Composable
 fun LuminaApp() {
     // Ya no necesitamos controlar pantallas, siempre mostramos el Mapa

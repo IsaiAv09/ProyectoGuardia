@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+/// Vista realizada por Rama 2
 @Composable
 fun SOSScreen() {
     var progress by remember { mutableStateOf(0f) }
