@@ -1,29 +1,57 @@
 package com.example.proyectoguardia
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.resources.painterResource
 
-import proyectoguardia.shared.generated.resources.Res
-import proyectoguardia.shared.generated.resources.compose_multiplatform
+enum class Screen {
+    Mapa, SOS, Guardia
+}
 
 @Composable
 @Preview
 fun App() {
+    var currentScreen by remember { mutableStateOf(Screen.Mapa) }
+
     MaterialTheme {
-        // Ahora mostramos la aplicación Lumina con sus dos pantallas
-        LuminaApp()
+        Scaffold(
+            bottomBar = {
+                NavigationBar {
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Default.Map, contentDescription = "Mapa") },
+                        label = { Text("Mapa") },
+                        selected = currentScreen == Screen.Mapa,
+                        onClick = { currentScreen = Screen.Mapa }
+                    )
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Default.Warning, contentDescription = "SOS") },
+                        label = { Text("SOS") },
+                        selected = currentScreen == Screen.SOS,
+                        onClick = { currentScreen = Screen.SOS }
+                    )
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Default.Info, contentDescription = "Info") },
+                        label = { Text("Info") },
+                        selected = currentScreen == Screen.Guardia,
+                        onClick = { currentScreen = Screen.Guardia }
+                    )
+                }
+            }
+        ) { padding ->
+            Box(modifier = Modifier.padding(padding)) {
+                when (currentScreen) {
+                    Screen.Mapa -> MapaTulancingoScreen()
+                    Screen.SOS -> SOSScreen()
+                    Screen.Guardia -> GuardiaView()
+                }
+            }
+        }
     }
 }
