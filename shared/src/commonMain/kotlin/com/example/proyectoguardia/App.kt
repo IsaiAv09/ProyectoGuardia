@@ -23,7 +23,7 @@ import proyectoguardia.shared.generated.resources.compose_multiplatform
 @Preview
 fun App() {
     MaterialTheme {
-        // Con esto se muestra la nueva vista en la pantalla principal
-        GuardiaView()
+        // Ahora mostramos la aplicación Lumina con sus dos pantallas
+        LuminaApp()
     }
 }
