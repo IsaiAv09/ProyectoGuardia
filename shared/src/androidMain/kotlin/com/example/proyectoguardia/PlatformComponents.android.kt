@@ -75,7 +75,7 @@ actual fun MapView(
                         body { margin: 0; padding: 0; }
                         #map { height: 100vh; width: 100vw; background: #fdf5e6; }
                         .leaflet-container { background: #fdf5e6; }
-                        /* Personalización del botón de ubicación */
+                        /* Personalización del botón de ubicación. */
                         .leaflet-control-locate a {
                             background-color: #FFB74D !important;
                             color: white !important;
