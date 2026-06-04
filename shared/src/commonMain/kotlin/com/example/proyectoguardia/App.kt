@@ -5,7 +5,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
 
 enum class AppScreen {
-    Login, Map
+    Login, Map, EmergencyContact
 }
 
 @Composable
@@ -19,7 +19,11 @@ fun App() {
                 onLoginSuccess = { currentScreen = AppScreen.Map }
             )
             AppScreen.Map -> MainMapView(
-                onLogout = { currentScreen = AppScreen.Login }
+                onLogout = { currentScreen = AppScreen.Login },
+                onShowEmergencyContact = { currentScreen = AppScreen.EmergencyContact }
+            )
+            AppScreen.EmergencyContact -> EmergencyContactView(
+                onBack = { currentScreen = AppScreen.Map }
             )
         }
     }

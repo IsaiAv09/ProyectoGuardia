@@ -2,12 +2,14 @@ package com.example.proyectoguardia
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddLocationAlt
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,7 +21,7 @@ import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainMapView(onLogout: () -> Unit) {
+fun MainMapView(onLogout: () -> Unit, onShowEmergencyContact: () -> Unit) {
     var isMapLoading by remember { mutableStateOf(true) }
     var isReportingMode by remember { mutableStateOf(false) }
 
@@ -47,6 +49,18 @@ fun MainMapView(onLogout: () -> Unit) {
                 isReportingMode = isReportingMode,
                 onPageFinished = { isMapLoading = false }
             )
+
+            SmallFloatingActionButton(
+                onClick = onShowEmergencyContact,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(16.dp),
+                containerColor = SoftAmber.copy(alpha = 0.9f),
+                contentColor = Color.White,
+                shape = CircleShape
+            ) {
+                Icon(Icons.Default.Phone, "Emergencia", modifier = Modifier.size(20.dp))
+            }
             
             Box(
                 modifier = Modifier
