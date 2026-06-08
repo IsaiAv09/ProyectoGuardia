@@ -5,8 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
@@ -21,16 +21,13 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-val WarmBeige = Color(0xFFFDF5E6)
-val SoftAmber = Color(0xFFFFB74D)
-val DeepCoffee = Color(0xFF4E342E)
-val CozyCream = Color(0xFFFFFDE7)
-
 @Composable
-fun LoginView(onLoginSuccess: () -> Unit, onRegistro: () -> Unit) {
+fun RegistroView(onRegistroExitoso: () -> Unit, onVolver: () -> Unit) {
     val storage = remember { StorageService() }
+    var nombre by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var confirmar by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
@@ -46,21 +43,9 @@ fun LoginView(onLoginSuccess: () -> Unit, onRegistro: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp)
         ) {
-            Surface(
-                modifier = Modifier.size(90.dp),
-                shape = RoundedCornerShape(30.dp),
-                color = SoftAmber,
-                shadowElevation = 4.dp
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(Icons.Default.Lightbulb, null, tint = Color.White, modifier = Modifier.size(45.dp))
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
             Text("LUMINA", fontSize = 36.sp, fontWeight = FontWeight.ExtraBold, color = WarmBeige, letterSpacing = 6.sp)
-            Text("Iluminando tu camino", fontSize = 16.sp, color = WarmBeige.copy(alpha = 0.8f))
-            Spacer(modifier = Modifier.height(40.dp))
+            Text("Crea tu cuenta", fontSize = 16.sp, color = WarmBeige.copy(alpha = 0.8f))
+            Spacer(modifier = Modifier.height(24.dp))
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -70,9 +55,22 @@ fun LoginView(onLoginSuccess: () -> Unit, onRegistro: () -> Unit) {
             ) {
                 Column(
                     modifier = Modifier.padding(28.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text("Bienvenido de nuevo", fontWeight = FontWeight.Bold, color = DeepCoffee, fontSize = 20.sp)
+                    Text("Registro", fontWeight = FontWeight.Bold, color = DeepCoffee, fontSize = 20.sp)
+
+                    OutlinedTextField(
+                        value = nombre,
+                        onValueChange = { nombre = it; errorMessage = "" },
+                        label = { Text("Nombre completo") },
+                        modifier = Modifier.fillMaxWidth(),
+                        leadingIcon = { Icon(Icons.Default.Person, null, tint = DeepCoffee) },
+                        shape = RoundedCornerShape(20.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = SoftAmber,
+                            unfocusedBorderColor = DeepCoffee.copy(alpha = 0.3f)
+                        )
+                    )
 
                     OutlinedTextField(
                         value = email,
@@ -109,40 +107,53 @@ fun LoginView(onLoginSuccess: () -> Unit, onRegistro: () -> Unit) {
                         )
                     )
 
+                    OutlinedTextField(
+                        value = confirmar,
+                        onValueChange = { confirmar = it; errorMessage = "" },
+                        label = { Text("Confirmar contraseña") },
+                        modifier = Modifier.fillMaxWidth(),
+                        leadingIcon = { Icon(Icons.Default.Lock, null, tint = DeepCoffee) },
+                        visualTransformation = PasswordVisualTransformation(),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = SoftAmber,
+                            unfocusedBorderColor = DeepCoffee.copy(alpha = 0.3f)
+                        )
+                    )
+
                     if (errorMessage.isNotEmpty()) {
                         Text(errorMessage, color = Color(0xFFD32F2F), fontSize = 12.sp)
                     }
 
                     Button(
                         onClick = {
-                            val emailGuardado = storage.getData("user_email")
-                            val passGuardado = storage.getData("user_password")
-                            if ((email == "lumina@gmail.com" && password == "1234") ||
-                                (email == emailGuardado && password == passGuardado && emailGuardado != "Sin datos")
-                            ) {
-                                onLoginSuccess()
-                            } else {
-                                errorMessage = "Credenciales incorrectas"
+                            when {
+                                nombre.isBlank() -> errorMessage = "Escribe tu nombre"
+                                email.isBlank() -> errorMessage = "Escribe tu email"
+                                !email.contains("@") -> errorMessage = "Email inválido"
+                                password.length < 4 -> errorMessage = "Contraseña muy corta"
+                                password != confirmar -> errorMessage = "Las contraseñas no coinciden"
+                                else -> {
+                                    storage.saveData("user_nombre", nombre)
+                                    storage.saveData("user_email", email)
+                                    storage.saveData("user_password", password)
+                                    println("Usuario registrado: $email")
+                                    onRegistroExitoso()
+                                }
                             }
                         },
                         modifier = Modifier.fillMaxWidth().height(56.dp),
                         shape = RoundedCornerShape(20.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = SoftAmber)
                     ) {
-                        Text("ENTRAR", fontWeight = FontWeight.Bold, color = Color.White)
+                        Text("CREAR CUENTA", fontWeight = FontWeight.Bold, color = Color.White)
                     }
 
-                    TextButton(
-                        onClick = onRegistro,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("¿No tienes cuenta? Regístrate", color = DeepCoffee)
+                    TextButton(onClick = onVolver, modifier = Modifier.fillMaxWidth()) {
+                        Text("¿Ya tienes cuenta? Inicia sesión", color = DeepCoffee)
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
-            Text("lumina@gmail.com / 1234", color = WarmBeige.copy(alpha = 0.7f), fontSize = 12.sp)
         }
     }
 }

@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.androidMultiplatformLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    kotlin("plugin.serialization") version "2.1.0"
 }
 
 kotlin {
@@ -62,8 +63,11 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(compose.materialIconsExtended)
 
-            // Agrega estas dos líneas justo aquí abajo:
+            // Ktor y Serialización
             implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.kotlinx.serialization.json)
             implementation(libs.settings.no.arg)
         }
         commonTest.dependencies {
