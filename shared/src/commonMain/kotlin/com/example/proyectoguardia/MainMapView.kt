@@ -5,10 +5,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AddLocationAlt
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -30,13 +30,13 @@ fun MainMapView(onLogout: () -> Unit, onShowEmergencyContact: () -> Unit) {
             TopAppBar(
                 title = { 
                     Column {
-                        Text("LUMINA", fontWeight = FontWeight.ExtraBold, color = DeepCoffee, fontSize = 20.sp)
+                        Text("Guardian Lumina", fontWeight = FontWeight.ExtraBold, color = DeepCoffee, fontSize = 20.sp)
                         Text("Tulancingo, Hidalgo", fontSize = 12.sp, color = SoftAmber)
                     }
                 },
                 actions = {
                     IconButton(onClick = onLogout) {
-                        Icon(Icons.Default.Logout, null, tint = DeepCoffee)
+                        Icon(Icons.AutoMirrored.Filled.Logout, null, tint = DeepCoffee)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = WarmBeige)

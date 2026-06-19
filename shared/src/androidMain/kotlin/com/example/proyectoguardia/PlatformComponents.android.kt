@@ -62,7 +62,7 @@ actual fun MapView(
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>Lumina Map</title>
+                    <title>Guardian Lumina Map</title>
                     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
                     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
                     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -92,6 +92,31 @@ actual fun MapView(
                         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                             attribution: '© OSM'
                         }).addTo(map);
+
+                        // Cargar trazos guardados
+                        var savedLayers = localStorage.getItem('lumina_layers');
+                        if (savedLayers) {
+                            var layers = JSON.parse(savedLayers);
+                            layers.forEach(function(l) {
+                                if (l.type === 'polyline') {
+                                    L.polyline(l.latlngs, l.options).addTo(map);
+                                }
+                            });
+                        }
+
+                        function saveLayers() {
+                            var layers = [];
+                            map.eachLayer(function(layer) {
+                                if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
+                                    layers.push({
+                                        type: 'polyline',
+                                        latlngs: layer.getLatLngs(),
+                                        options: layer.options
+                                    });
+                                }
+                            });
+                            localStorage.setItem('lumina_layers', JSON.stringify(layers));
+                        }
 
                         // Agregar control de ubicación
                         var lc = L.control.locate({
@@ -156,14 +181,12 @@ actual fun MapView(
                                     opacity: 0.9
                                 }).addTo(map);
 
-                                // Reset para el siguiente tramo (deja marcar múltiples tramos)
+                                // Guardar cambios
+                                saveLayers();
+
+                                // Reset para el siguiente tramo
                                 if (tempMarker) map.removeLayer(tempMarker);
                                 
-                                // Opcional: El segundo punto se vuelve el primero para continuar la línea
-                                // firstPoint = secondPoint; 
-                                // tempMarker = L.circleMarker(firstPoint, {...}).addTo(map);
-                                
-                                // Para este requerimiento, parece que quieren 2 puntos y ya
                                 firstPoint = null;
                                 tempMarker = null;
                             }

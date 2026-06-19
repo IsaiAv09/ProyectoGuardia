@@ -20,6 +20,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.proyectoguardia.basededatos.StorageService
 
 @Composable
 fun RegistroView(onRegistroExitoso: () -> Unit, onVolver: () -> Unit) {
@@ -43,7 +44,7 @@ fun RegistroView(onRegistroExitoso: () -> Unit, onVolver: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp)
         ) {
-            Text("LUMINA", fontSize = 36.sp, fontWeight = FontWeight.ExtraBold, color = WarmBeige, letterSpacing = 6.sp)
+            Text("Guardian Lumina", fontSize = 36.sp, fontWeight = FontWeight.ExtraBold, color = WarmBeige, letterSpacing = 2.sp)
             Text("Crea tu cuenta", fontSize = 16.sp, color = WarmBeige.copy(alpha = 0.8f))
             Spacer(modifier = Modifier.height(24.dp))
 

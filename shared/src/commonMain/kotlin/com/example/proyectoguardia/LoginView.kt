@@ -20,6 +20,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.proyectoguardia.basededatos.StorageService
 
 val WarmBeige = Color(0xFFFDF5E6)
 val SoftAmber = Color(0xFFFFB74D)
@@ -58,7 +59,7 @@ fun LoginView(onLoginSuccess: () -> Unit, onRegistro: () -> Unit) {
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-            Text("LUMINA", fontSize = 36.sp, fontWeight = FontWeight.ExtraBold, color = WarmBeige, letterSpacing = 6.sp)
+            Text("Guardian Lumina", fontSize = 36.sp, fontWeight = FontWeight.ExtraBold, color = WarmBeige, letterSpacing = 2.sp)
             Text("Iluminando tu camino", fontSize = 16.sp, color = WarmBeige.copy(alpha = 0.8f))
             Spacer(modifier = Modifier.height(40.dp))
 
