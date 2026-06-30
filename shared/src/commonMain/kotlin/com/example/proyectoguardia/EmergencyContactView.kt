@@ -3,12 +3,14 @@ package com.example.proyectoguardia
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.proyectoguardia.basededatos.ApiService
@@ -30,8 +32,8 @@ fun EmergencyContactView(
     val storage = StorageService()
     val apiService = ApiService()
     val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
     
-    // Carga inicial de datos
     fun getSaved(key: String) = storage.getData(key).let { if (it == "Sin datos") "" else it }
 
     var nombre by remember { mutableStateOf(getSaved("contacto_nombre")) }
@@ -40,7 +42,6 @@ fun EmergencyContactView(
     
     var isEditable by remember { mutableStateOf(nombre.isEmpty()) }
     
-    // Estados para el resumen (lo que está guardado físicamente)
     var savedNombre by remember { mutableStateOf(getSaved("contacto_nombre")) }
     var savedNumero by remember { mutableStateOf(getSaved("contacto_numero")) }
     var savedParentesco by remember { mutableStateOf(getSaved("contacto_parentesco")) }
@@ -63,7 +64,14 @@ fun EmergencyContactView(
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = DeepCoffee,
-                modifier = Modifier.padding(bottom = 24.dp)
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            Text(
+                text = "Los campos con (*) son obligatorios",
+                fontSize = 14.sp,
+                color = Color.Gray,
+                modifier = Modifier.padding(bottom = 16.dp)
             )
 
             Card(
@@ -79,7 +87,7 @@ fun EmergencyContactView(
                     OutlinedTextField(
                         value = nombre,
                         onValueChange = { if (isEditable) nombre = it },
-                        label = { Text("Nombre") },
+                        label = { Text("Nombre *") },
                         enabled = isEditable,
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
@@ -93,10 +101,11 @@ fun EmergencyContactView(
                     OutlinedTextField(
                         value = numero,
                         onValueChange = { if (isEditable) numero = it },
-                        label = { Text("Número telefónico") },
+                        label = { Text("Número telefónico *") },
                         enabled = isEditable,
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = SoftAmber,
                             unfocusedBorderColor = DeepCoffee.copy(alpha = 0.3f),
@@ -107,7 +116,7 @@ fun EmergencyContactView(
                     OutlinedTextField(
                         value = parentesco,
                         onValueChange = { if (isEditable) parentesco = it },
-                        label = { Text("Parentesco") },
+                        label = { Text("Parentesco *") },
                         enabled = isEditable,
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
@@ -122,7 +131,6 @@ fun EmergencyContactView(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Botones de Acción
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -130,19 +138,28 @@ fun EmergencyContactView(
                 if (isEditable) {
                     Button(
                         onClick = {
-                            // 1. Guardar localmente
-                            storage.saveData("contacto_nombre", nombre)
-                            storage.saveData("contacto_numero", numero)
-                            storage.saveData("contacto_parentesco", parentesco)
-                            savedNombre = nombre
-                            savedNumero = numero
-                            savedParentesco = parentesco
-                            isEditable = false
+                            println("LOG: Iniciando guardado...")
+                            println("LOG: Teléfono capturado = '$numero'")
 
-                            // 2. Enviar al servidor (Aquí es donde se activan los logs del ApiService)
-                            val contacto = EmergencyContact(nombre, numero, parentesco)
-                            scope.launch {
-                                apiService.guardarContacto(contacto)
+                            if (numero.length >= 10) {
+                                val lada = numero.substring(0, 2) 
+                                
+                                storage.saveData("contacto_nombre", nombre)
+                                storage.saveData("contacto_numero", numero)
+                                storage.saveData("contacto_parentesco", parentesco)
+                                savedNombre = nombre
+                                savedNumero = numero
+                                savedParentesco = parentesco
+                                isEditable = false
+
+                                scope.launch {
+                                    apiService.guardarContacto(EmergencyContact(nombre, numero, parentesco))
+                                    snackbarHostState.showSnackbar("Contacto guardado con éxito")
+                                }
+                            } else {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar("Error: El número debe tener al menos 10 dígitos")
+                                }
                             }
                         },
                         modifier = Modifier.weight(1f).height(50.dp),
@@ -185,7 +202,6 @@ fun EmergencyContactView(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Resumen Visual
             if (savedNombre.isNotEmpty()) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -210,5 +226,10 @@ fun EmergencyContactView(
                 Text("Volver", color = DeepCoffee, fontWeight = FontWeight.SemiBold)
             }
         }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }
