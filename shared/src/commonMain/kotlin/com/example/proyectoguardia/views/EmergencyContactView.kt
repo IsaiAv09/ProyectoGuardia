@@ -1,4 +1,4 @@
-package com.example.proyectoguardia
+package com.example.proyectoguardia.views
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,15 +13,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.proyectoguardia.basededatos.ApiService
 import com.example.proyectoguardia.basededatos.StorageService
-import kotlinx.serialization.Serializable
+import com.example.proyectoguardia.modelos.EmergencyContact
 import kotlinx.coroutines.launch
-
-@Serializable
-data class EmergencyContact(
-    val nombre: String,
-    val numero: String,
-    val parentesco: String
-)
 
 @Composable
 fun EmergencyContactView(
@@ -130,19 +123,27 @@ fun EmergencyContactView(
                 if (isEditable) {
                     Button(
                         onClick = {
-                            // 1. Guardar localmente
-                            storage.saveData("contacto_nombre", nombre)
-                            storage.saveData("contacto_numero", numero)
-                            storage.saveData("contacto_parentesco", parentesco)
-                            savedNombre = nombre
-                            savedNumero = numero
-                            savedParentesco = parentesco
-                            isEditable = false
+                            // Filtro de seguridad implementado en EmergencyContactView.kt
+                            if (numero.length == 10) {
+                                val lada = numero.substring(0, 3)
+                                println("DEPURACIÓN: Procesando Lada: $lada")
 
-                            // 2. Enviar al servidor (Aquí es donde se activan los logs del ApiService)
-                            val contacto = EmergencyContact(nombre, numero, parentesco)
-                            scope.launch {
-                                apiService.guardarContacto(contacto)
+                                // 1. Guardar localmente
+                                storage.saveData("contacto_nombre", nombre)
+                                storage.saveData("contacto_numero", numero)
+                                storage.saveData("contacto_parentesco", parentesco)
+                                savedNombre = nombre
+                                savedNumero = numero
+                                savedParentesco = parentesco
+                                isEditable = false
+
+                                // 2. Enviar al servidor
+                                val contacto = EmergencyContact(nombre, numero, parentesco)
+                                scope.launch {
+                                    apiService.guardarContacto(contacto)
+                                }
+                            } else {
+                                println("DEPURACIÓN: Datos inválidos. Se evitó la excepción.")
                             }
                         },
                         modifier = Modifier.weight(1f).height(50.dp),

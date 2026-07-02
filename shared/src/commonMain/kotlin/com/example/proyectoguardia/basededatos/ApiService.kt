@@ -1,6 +1,6 @@
 package com.example.proyectoguardia.basededatos
 
-import com.example.proyectoguardia.EmergencyContact
+import com.example.proyectoguardia.modelos.EmergencyContact
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
