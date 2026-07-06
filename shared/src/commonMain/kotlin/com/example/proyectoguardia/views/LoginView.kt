@@ -22,7 +22,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.proyectoguardia.basededatos.ApiService
 import com.example.proyectoguardia.basededatos.StorageService
+import kotlinx.coroutines.launch
 
 val WarmBeige = Color(0xFFFDF5E6)
 val SoftAmber = Color(0xFFFFB74D)
@@ -32,10 +34,14 @@ val CozyCream = Color(0xFFFFFDE7)
 @Composable
 fun LoginView(onLoginSuccess: () -> Unit, onRegistro: () -> Unit) {
     val storage = remember { StorageService() }
+    val apiService = remember { ApiService() }
+    val scope = rememberCoroutineScope()
+    
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
 
     val gradient = Brush.verticalGradient(
         colors = listOf(Color(0xFF8D6E63), Color(0xFF4E342E))
@@ -121,21 +127,34 @@ fun LoginView(onLoginSuccess: () -> Unit, onRegistro: () -> Unit) {
 
                     Button(
                         onClick = {
-                            val emailGuardado = storage.getData("user_email")
-                            val passGuardado = storage.getData("user_password")
-                            if ((email == "lumina@gmail.com" && password == "1234") ||
-                                (email == emailGuardado && password == passGuardado && emailGuardado != "Sin datos")
-                            ) {
-                                onLoginSuccess()
+                            if (email.isNotBlank() && password.isNotBlank()) {
+                                isLoading = true
+                                scope.launch {
+                                    val success = apiService.iniciarSesion(email, password)
+                                    isLoading = false
+                                    if (success) {
+                                        // Guardamos sesión local para persistencia si quieres
+                                        storage.saveData("session_active", "true")
+                                        storage.saveData("user_email", email)
+                                        onLoginSuccess()
+                                    } else {
+                                        errorMessage = "Email o contraseña incorrectos"
+                                    }
+                                }
                             } else {
-                                errorMessage = "Credenciales incorrectas"
+                                errorMessage = "Completa todos los campos"
                             }
                         },
                         modifier = Modifier.fillMaxWidth().height(56.dp),
                         shape = RoundedCornerShape(20.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = SoftAmber)
+                        colors = ButtonDefaults.buttonColors(containerColor = SoftAmber),
+                        enabled = !isLoading
                     ) {
-                        Text("ENTRAR", fontWeight = FontWeight.Bold, color = Color.White)
+                        if (isLoading) {
+                            CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                        } else {
+                            Text("ENTRAR", fontWeight = FontWeight.Bold, color = Color.White)
+                        }
                     }
 
                     TextButton(
@@ -148,7 +167,6 @@ fun LoginView(onLoginSuccess: () -> Unit, onRegistro: () -> Unit) {
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-            Text("lumina@gmail.com / 1234", color = WarmBeige.copy(alpha = 0.7f), fontSize = 12.sp)
         }
     }
 }

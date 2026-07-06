@@ -22,17 +22,24 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.proyectoguardia.basededatos.ApiService
 import com.example.proyectoguardia.basededatos.StorageService
+import com.example.proyectoguardia.modelos.User
+import kotlinx.coroutines.launch
 
 @Composable
 fun RegistroView(onRegistroExitoso: () -> Unit, onVolver: () -> Unit) {
     val storage = remember { StorageService() }
+    val apiService = remember { ApiService() }
+    val scope = rememberCoroutineScope()
+    
     var nombre by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmar by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
 
     val gradient = Brush.verticalGradient(
         colors = listOf(Color(0xFF8D6E63), Color(0xFF4E342E))
@@ -140,19 +147,32 @@ fun RegistroView(onRegistroExitoso: () -> Unit, onVolver: () -> Unit) {
                                 password.length < 4 -> errorMessage = "Contraseña muy corta"
                                 password != confirmar -> errorMessage = "Las contraseñas no coinciden"
                                 else -> {
-                                    storage.saveData("user_nombre", nombre)
-                                    storage.saveData("user_email", email)
-                                    storage.saveData("user_password", password)
-                                    println("Usuario registrado: $email")
-                                    onRegistroExitoso()
+                                    isLoading = true
+                                    scope.launch {
+                                        val user = User(nombre, email, password)
+                                        val success = apiService.registrarUsuario(user)
+                                        isLoading = false
+                                        if (success) {
+                                            storage.saveData("user_nombre", nombre)
+                                            storage.saveData("user_email", email)
+                                            onRegistroExitoso()
+                                        } else {
+                                            errorMessage = "Error al registrar el usuario"
+                                        }
+                                    }
                                 }
                             }
                         },
                         modifier = Modifier.fillMaxWidth().height(56.dp),
                         shape = RoundedCornerShape(20.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = SoftAmber)
+                        colors = ButtonDefaults.buttonColors(containerColor = SoftAmber),
+                        enabled = !isLoading
                     ) {
-                        Text("CREAR CUENTA", fontWeight = FontWeight.Bold, color = Color.White)
+                        if (isLoading) {
+                            CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                        } else {
+                            Text("CREAR CUENTA", fontWeight = FontWeight.Bold, color = Color.White)
+                        }
                     }
 
                     TextButton(onClick = onVolver, modifier = Modifier.fillMaxWidth()) {

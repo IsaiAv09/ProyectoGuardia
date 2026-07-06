@@ -38,147 +38,189 @@ fun EmergencyContactView(
     var savedNumero by remember { mutableStateOf(getSaved("contacto_numero")) }
     var savedParentesco by remember { mutableStateOf(getSaved("contacto_parentesco")) }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(WarmBeige)
-            .padding(24.dp)
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+    var isLoading by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        containerColor = Color.Transparent
+    ) { padding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(WarmBeige)
+                .padding(padding)
+                .padding(24.dp)
         ) {
-            Spacer(modifier = Modifier.height(40.dp))
-            
-            Text(
-                text = "Contacto de Emergencia",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = DeepCoffee,
-                modifier = Modifier.padding(bottom = 24.dp)
-            )
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = CozyCream),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                Spacer(modifier = Modifier.height(40.dp))
+                
+                Text(
+                    text = "Contacto de Emergencia",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = DeepCoffee,
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = CozyCream),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
-                    OutlinedTextField(
-                        value = nombre,
-                        onValueChange = { if (isEditable) nombre = it },
-                        label = { Text("Nombre") },
-                        enabled = isEditable,
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = SoftAmber,
-                            unfocusedBorderColor = DeepCoffee.copy(alpha = 0.3f),
-                            disabledBorderColor = DeepCoffee.copy(alpha = 0.1f)
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = nombre,
+                            onValueChange = { if (isEditable) nombre = it },
+                            label = { Text("Nombre") },
+                            enabled = isEditable && !isLoading,
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = SoftAmber,
+                                unfocusedBorderColor = DeepCoffee.copy(alpha = 0.3f),
+                                disabledBorderColor = DeepCoffee.copy(alpha = 0.1f)
+                            )
                         )
-                    )
 
-                    OutlinedTextField(
-                        value = numero,
-                        onValueChange = { if (isEditable) numero = it },
-                        label = { Text("Número telefónico") },
-                        enabled = isEditable,
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = SoftAmber,
-                            unfocusedBorderColor = DeepCoffee.copy(alpha = 0.3f),
-                            disabledBorderColor = DeepCoffee.copy(alpha = 0.1f)
+                        OutlinedTextField(
+                            value = numero,
+                            onValueChange = { if (isEditable) numero = it },
+                            label = { Text("Número telefónico") },
+                            enabled = isEditable && !isLoading,
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = SoftAmber,
+                                unfocusedBorderColor = DeepCoffee.copy(alpha = 0.3f),
+                                disabledBorderColor = DeepCoffee.copy(alpha = 0.1f)
+                            )
                         )
-                    )
 
-                    OutlinedTextField(
-                        value = parentesco,
-                        onValueChange = { if (isEditable) parentesco = it },
-                        label = { Text("Parentesco") },
-                        enabled = isEditable,
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = SoftAmber,
-                            unfocusedBorderColor = DeepCoffee.copy(alpha = 0.3f),
-                            disabledBorderColor = DeepCoffee.copy(alpha = 0.1f)
+                        OutlinedTextField(
+                            value = parentesco,
+                            onValueChange = { if (isEditable) parentesco = it },
+                            label = { Text("Parentesco") },
+                            enabled = isEditable && !isLoading,
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = SoftAmber,
+                                unfocusedBorderColor = DeepCoffee.copy(alpha = 0.3f),
+                                disabledBorderColor = DeepCoffee.copy(alpha = 0.1f)
+                            )
                         )
-                    )
+                    }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-            // Botones de Acción
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                if (isEditable) {
-                    Button(
-                        onClick = {
-                            // Filtro de seguridad implementado en EmergencyContactView.kt
-                            if (numero.length == 10) {
-                                val lada = numero.substring(0, 3)
-                                println("DEPURACIÓN: Procesando Lada: $lada")
+                // Botones de Acción
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    if (isEditable) {
+                        Button(
+                            onClick = {
+                                // Filtro de seguridad implementado en EmergencyContactView.kt
+                                if (numero.length == 10) {
+                                    val lada = numero.substring(0, 3)
+                                    println("DEPURACIÓN: Procesando Lada: $lada")
 
-                                // 1. Guardar localmente
-                                storage.saveData("contacto_nombre", nombre)
-                                storage.saveData("contacto_numero", numero)
-                                storage.saveData("contacto_parentesco", parentesco)
-                                savedNombre = nombre
-                                savedNumero = numero
-                                savedParentesco = parentesco
-                                isEditable = false
-
-                                // 2. Enviar al servidor
-                                val contacto = EmergencyContact(nombre, numero, parentesco)
-                                scope.launch {
-                                    apiService.guardarContacto(contacto)
+                                    isLoading = true
+                                    
+                                    // 2. Enviar al servidor
+                                    val contacto = EmergencyContact(nombre, numero, parentesco)
+                                    scope.launch {
+                                        val exito = apiService.guardarContacto(contacto)
+                                        isLoading = false
+                                        
+                                        if (exito) {
+                                            // 1. Guardar localmente solo si el envío fue exitoso (opcional, pero mejor para consistencia)
+                                            storage.saveData("contacto_nombre", nombre)
+                                            storage.saveData("contacto_numero", numero)
+                                            storage.saveData("contacto_parentesco", parentesco)
+                                            savedNombre = nombre
+                                            savedNumero = numero
+                                            savedParentesco = parentesco
+                                            isEditable = false
+                                            snackbarHostState.showSnackbar("Contacto guardado en el servidor")
+                                        } else {
+                                            snackbarHostState.showSnackbar("Error al guardar en el servidor. Revisa tu conexión.")
+                                        }
+                                    }
+                                } else {
+                                    println("DEPURACIÓN: Datos inválidos. Se evitó la excepción.")
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar("El número debe tener 10 dígitos")
+                                    }
                                 }
+                            },
+                            modifier = Modifier.weight(1f).height(50.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = SoftAmber),
+                            shape = RoundedCornerShape(12.dp),
+                            enabled = !isLoading
+                        ) {
+                            if (isLoading) {
+                                CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
                             } else {
-                                println("DEPURACIÓN: Datos inválidos. Se evitó la excepción.")
+                                Text("Guardar", color = Color.White)
                             }
-                        },
-                        modifier = Modifier.weight(1f).height(50.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = SoftAmber),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("Guardar", color = Color.White)
+                        }
+                    } else {
+                        Button(
+                            onClick = { isEditable = true },
+                            modifier = Modifier.weight(1f).height(50.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = DeepCoffee),
+                            shape = RoundedCornerShape(12.dp),
+                            enabled = !isLoading
+                        ) {
+                            Text("Editar", color = Color.White)
+                        }
                     }
-                } else {
-                    Button(
-                        onClick = { isEditable = true },
-                        modifier = Modifier.weight(1f).height(50.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = DeepCoffee),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("Editar", color = Color.White)
-                    }
-                }
 
                 Button(
                     onClick = {
-                        storage.saveData("contacto_nombre", "")
-                        storage.saveData("contacto_numero", "")
-                        storage.saveData("contacto_parentesco", "")
-                        nombre = ""
-                        numero = ""
-                        parentesco = ""
-                        savedNombre = ""
-                        savedNumero = ""
-                        savedParentesco = ""
-                        isEditable = true
+                        if (numero.isNotEmpty()) {
+                            isLoading = true
+                            scope.launch {
+                                val exito = apiService.eliminarContacto(numero)
+                                isLoading = false
+                                if (exito) {
+                                    storage.saveData("contacto_nombre", "")
+                                    storage.saveData("contacto_numero", "")
+                                    storage.saveData("contacto_parentesco", "")
+                                    nombre = ""
+                                    numero = ""
+                                    parentesco = ""
+                                    savedNombre = ""
+                                    savedNumero = ""
+                                    savedParentesco = ""
+                                    isEditable = true
+                                    snackbarHostState.showSnackbar("Contacto eliminado del servidor")
+                                } else {
+                                    snackbarHostState.showSnackbar("Error al eliminar del servidor")
+                                }
+                            }
+                        } else {
+                            // Si no hay número, solo limpiamos localmente (caso de campos vacíos)
+                            nombre = ""; numero = ""; parentesco = ""
+                            isEditable = true
+                        }
                     },
                     modifier = Modifier.weight(1f).height(50.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE57373)),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    enabled = !isLoading
                 ) {
                     Text("Eliminar", color = Color.White)
                 }
@@ -212,4 +254,5 @@ fun EmergencyContactView(
             }
         }
     }
+}
 }
